@@ -19,33 +19,61 @@ void CommandDispatcher::register_defaults()
             return "You are floating in an empty void.\r\n";
         }
     };
+
     handlers_["north"] = [](Session& session, const ParsedCommand& /*cmd*/) -> std::string {
-        return session.handle_move("north");
-    };
-    handlers_["south"] = [](Session& session, const ParsedCommand& /*cmd*/) -> std::string {
-        return session.handle_move("south");
-    };
-    handlers_["east"] = [](Session& session, const ParsedCommand& /*cmd*/) -> std::string {
-        return session.handle_move("east");
-    };
-    handlers_["west"] = [](Session& session, const ParsedCommand& /*cmd*/) -> std::string {
-        return session.handle_move("west");
-    };
-    handlers_["get"] = [](Session& session, const ParsedCommand& cmd) -> std::string {
-        return session.handle_get(cmd);
+        if (session.player_.currentRoom && session.player_.currentRoom->exits.count("north")) {
+            session.player_.currentRoom = session.player_.currentRoom->exits["north"];
+            std::ostringstream oss;
+            oss << session.player_.currentRoom->description << "\r\n";
+            oss << session.player_.currentRoom->describe_items();
+            return oss.str();
+        } else {
+            return "You can't go that way.\r\n";
+        }
     };
 
+    handlers_["south"] = [](Session& session, const ParsedCommand& /*cmd*/) -> std::string {
+        if (session.player_.currentRoom && session.player_.currentRoom->exits.count("south")) {
+            session.player_.currentRoom = session.player_.currentRoom->exits["south"];
+            std::ostringstream oss;
+            oss << session.player_.currentRoom->description << "\r\n";
+            oss << session.player_.currentRoom->describe_items();
+            return oss.str();
+        } else {
+            return "You can't go that way.\r\n";
+        }
+    };
+
+    handlers_["east"] = [](Session& session, const ParsedCommand& /*cmd*/) -> std::string {
+        if (session.player_.currentRoom && session.player_.currentRoom->exits.count("east")) {
+            session.player_.currentRoom = session.player_.currentRoom->exits["east"];
+            std::ostringstream oss;
+            oss << session.player_.currentRoom->description << "\r\n";
+            oss << session.player_.currentRoom->describe_items();
+            return oss.str();
+        } else {
+            return "You can't go that way.\r\n";
+        }
+    };
+
+    handlers_["west"] = [](Session& session, const ParsedCommand& /*cmd*/) -> std::string {
+        if (session.player_.currentRoom && session.player_.currentRoom->exits.count("west")) {
+            session.player_.currentRoom = session.player_.currentRoom->exits["west"];
+            std::ostringstream oss;
+            oss << session.player_.currentRoom->description << "\r\n";
+            oss << session.player_.currentRoom->describe_items();
+            return oss.str();
+        } else {
+            return "You can't go that way.\r\n";
+        }
+    };
 }
 
-CommandHandler CommandDispatcher::get_handler(const std::string& verb) {
-    auto it = handlers_.find(verb);
-    if (it != handlers_.end()) {
-        return it->second;
+CommandHandler CommandDispatcher::get_handler(const std::string& verb)
+{
+    if (handlers_.count(verb)) {
+        return handlers_[verb];
     } else {
         return default_handler_;
     }
-}
-
-std::string CommandDispatcher::default_handler_(Session& /*session*/, const ParsedCommand& /*cmd*/) {
-    return "Invalid command.\r\n";
 }
