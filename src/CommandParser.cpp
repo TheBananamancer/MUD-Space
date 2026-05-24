@@ -24,31 +24,27 @@ ParsedCommand CommandParser::parse(const std::string& raw_input)
     }
 
     // Add support for direction commands
-    if (cmd.verb == "n" || cmd.verb == "north") {
+    if (cmd.verb == "n") {
         cmd.verb = "north";
-    } else if (cmd.verb == "s" || cmd.verb == "south") {
+    } else if (cmd.verb == "s") {
         cmd.verb = "south";
-    } else if (cmd.verb == "e" || cmd.verb == "east") {
+    } else if (cmd.verb == "e") {
         cmd.verb = "east";
-    } else if (cmd.verb == "w" || cmd.verb == "west") {
+    } else if (cmd.verb == "w") {
         cmd.verb = "west";
     }
 
     return cmd;
 }
 
-std::string CommandParser::strip(const std::string& input)
+std::string CommandParser::strip(const std::string& s)
 {
-    std::string result = input;
-    size_t start = result.find_first_not_of(" \t\r\n");
-    if (start == std::string::npos) {
-        return "";
-    }
-    result = result.substr(start);
-    size_t end = result.find_last_not_of(" \t\r\n");
-    if (end == std::string::npos) {
-        return "";
-    }
-    result = result.substr(0, end + 1);
+    std::string result = s;
+    result.erase(result.begin(), std::find_if(result.begin(), result.end(), [](int ch) {
+        return !std::isspace(ch);
+    }));
+    result.erase(std::find_if(result.rbegin(), result.rend(), [](int ch) {
+        return !std::isspace(ch);
+    }).base(), result.end());
     return result;
 }
